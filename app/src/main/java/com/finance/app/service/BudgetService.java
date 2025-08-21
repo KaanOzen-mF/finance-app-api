@@ -3,7 +3,10 @@ package com.finance.app.service;
 import com.finance.app.model.Budget;
 import com.finance.app.model.User;
 import com.finance.app.repository.BudgetRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,5 +47,14 @@ public class BudgetService {
 
     public void deleteBudget(UUID id) {
         budgetRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateCurrentSpent(UUID budgetId, BigDecimal amount) {
+        budgetRepository.findById(budgetId)
+                .ifPresent(budget -> {
+                    budget.setCurrentSpent(budget.getCurrentSpent().add(amount));
+                    budgetRepository.save(budget);
+                });
     }
 }
